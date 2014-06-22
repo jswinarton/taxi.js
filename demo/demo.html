@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Test</title>
+        <meta name="description" content="">
+        <style type="text/css">
+        </style>
+    </head>
+    <body>
+        <div id="confessional">
+            <section style="background:#eee">LLLLLL</section>
+            <section style="background:#ccc" class="expanded">
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+                l<br>
+            </section>
+            <section style="background:#aaa">44</section>
+        </div>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="../src/movement.js"></script>
+        <script src="../src/confessional.js"></script>
+
+        <script type="text/javascript">
+            $(function(){
+                window.test = $('#confessional').confessional({
+                    guidedScrolling: true
+                });
+
+
+                test.on('sectionchange.confessional', function(e, index){
+                    console.log('fock yea', index);
+                })
+            });
+
+            // $(function(){
+            //     $(document).on('movement', function(e, direction){
+            //         console.log('haha!', direction);
+            //     })
+            // });
+        </script>
+    </body>
+</html>

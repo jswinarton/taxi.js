@@ -1,12 +1,3 @@
-// var options = {};
-// var sections;
-
-// // caches pixel values of the 'top' position of each section.
-// // updated every time draw is called
-// var sectionPositions = [];
-// var _currentSection;  // cache this value for comparison on scroll
-// var inTransition = false; // true while sliding
-
 ;(function($){
     'use strict';
 
@@ -29,9 +20,9 @@
     };
 
     Confessional.prototype.draw = function() {
-        // Size and position the sections.
-        // Call if a section is added or removed or
-        // and caches the section data in this.sectionData
+        // Sizes and positions the sections
+        // and caches the section data in this.sectionData.
+        // Call if a section is added or removed
 
         var sectionData = [];
         var viewportHeight = $(window).height();
@@ -65,7 +56,7 @@
         this.sectionData = sectionData;
 
         return this;
-    }
+    };
 
     Confessional.prototype.currentSection = function() {
         // returns the index of the section currently in view
@@ -78,17 +69,7 @@
             }
         }
         return 0;  // catch negative scrolling browser behaviour
-    }
-
-    // Confessional.prototype.moveTo = function(index) {
-    //     if (index >= sections.length) {
-    //         $.error('Out of range: this instance only has ' + sections.length + ' sections');
-    //     }
-    //     var el = sections[index].element;
-    //     var pixels = parseInt(el.css('top'));
-    //     $(window).scrollTop(pixels);
-    //     return this;
-    // }
+    };
 
     Confessional.prototype.to = function(index) {
         if (index >= this.sectionData.length) {
@@ -100,17 +81,17 @@
         var destination = parseInt(this.sectionData[index].element.css('top'));
         this.transform(destination);
         return this;
-    }
+    };
 
     Confessional.prototype.previous = function() {
         var cur = this.currentSection();
         return (cur > 0) ? this.to(cur-1) : false;
-    }
+    };
 
     Confessional.prototype.next = function() {
         var cur = this.currentSection();
         return (cur < this.sectionData.length -1) ? this.to(cur+1) : false;
-    }
+    };
 
     Confessional.prototype.transform = function(x) {
         var that = this;
@@ -124,7 +105,7 @@
         });
 
         return this;
-    }
+    };
 
     Confessional.prototype.movementHandler = function(e, direction) {
         if (this.options.guidedScrolling) {
@@ -133,7 +114,7 @@
                 else if (direction == 'down') { this.next(); }
             }
         }
-    }
+    };
 
     Confessional.prototype.checkSectionChange = function() {
         var currentSection = this.currentSection();
@@ -141,7 +122,7 @@
             this.$element.trigger('sectionchange.confessional', [currentSection])
         }
         this._currentSection = currentSection;
-    }
+    };
 
     Confessional.prototype.publicMethods = [
         'draw',
@@ -160,7 +141,7 @@
         this.lockHandler = function(e) {
             e.preventDefault();
         }
-    }
+    };
 
     ScrollLock.prototype.go = function(action) {
         if (!action) return this.isLocked;
@@ -172,7 +153,7 @@
             $(document).off(this.evtString, this.lockHandler);
             this.isLocked = false;
         }
-    }
+    };
 
     // Plugin definition
     // =================
@@ -232,7 +213,7 @@
         element.one('transitionend webkitTransitionEnd', dfd.resolve);
 
         return dfd.promise();
-    }
+    };
 
     $.fn.confessional.defaults = {
         sectionSelector: 'section',

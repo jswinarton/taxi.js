@@ -127,9 +127,11 @@
     }
 
     Confessional.prototype.movementHandler = function(e, direction) {
-        if (!this.transforming) {
-            if (direction == 'up') { this.previous(); }
-            else if (direction == 'down') { this.next(); }
+        if (this.options.guidedScrolling) {
+            if (!this.transforming) {
+                if (direction == 'up') { this.previous(); }
+                else if (direction == 'down') { this.next(); }
+            }
         }
     }
 

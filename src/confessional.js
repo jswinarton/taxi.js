@@ -113,7 +113,7 @@
         this.scrollLock.go('lock');
         this.preventScroll = true;
 
-        $.fn.confessional.transform(this.$element, x).done(function(){
+        $.fn.confessional.transform(this.$element, x, this.options).done(function(){
             that.preventScroll = false;
             !that.options.guidedScrolling && that.scrollLock.go('unlock');
             that.checkSectionChange();
@@ -158,7 +158,6 @@
 
                 if (upperLimit || lowerLimit) {
                     this.expandedScrollingMode = false;
-                    // this.preventScroll = true;
                     this.scrollLock.go('lock');
                     $(document).off('scroll', checkOnScroll);
 
@@ -247,19 +246,20 @@
     being scrolled to. Returns a jQuery promise object which is resolved upon
     completion of the animations.
     */
-    $.fn.confessional.transform = function(element, x) {
+    $.fn.confessional.transform = function(element, x, options) {
         var dfd = $.Deferred();
 
         var currentPos = $(document).scrollTop();
         var delta = x - currentPos;
+        var transitionString = 'all ' + options.scrollSpeed + 'ms ease';
 
         $(window).scrollTop(x);
 
         element.css('margin-top', delta);
         element[0].offsetHeight; // trigger reflow, flush CSS
         element.css({
-            '-webkit-transition': 'all 1000ms ease',
-            'transition': 'all 1000ms ease',
+            '-webkit-transition': transitionString,
+            'transition': transitionString,
             'margin-top': 0
         });
         element[0].offsetHeight; // trigger reflow, flush CSS
@@ -276,7 +276,8 @@
     $.fn.confessional.defaults = {
         sectionSelector: 'section',
         expandedSectionClass: 'expanded',
-        guidedScrolling: true
+        guidedScrolling: true,
+        scrollSpeed: 700
     };
 
 })(jQuery);

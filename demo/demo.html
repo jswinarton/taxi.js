@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-        <div id="confessional">
+        <div id="taxi">
             <section style="background:#eee"></section>
             <section style="background:#ccc" class="expanded">
                 1<br>
@@ -181,17 +181,15 @@
         </div>
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="../src/movement.js"></script>
-        <script src="../src/confessional.js"></script>
+        <script src="../src/taxi.js"></script>
 
         <script type="text/javascript">
             $(function(){
-                window.test = $('#confessional').confessional({
-                    guidedScrolling: true
-                });
+                window.test = $('#taxi').taxi();
 
-                // test.on('sectionchange.confessional', function(e, index){
-                //     console.log('fock yea', index);
-                // })
+                test.on('sectionchange.taxi', function(e, index){
+                    console.log('taxi section change', index);
+                })
             });
         </script>
     </body>

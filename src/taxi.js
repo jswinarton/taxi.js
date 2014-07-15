@@ -1,7 +1,7 @@
 ;(function($){
     'use strict';
 
-    var Confessional = function(element, options) {
+    var Taxi = function(element, options) {
         var that = this;
         this.$element = $(element);
         this.options = options;
@@ -19,11 +19,11 @@
 
         if (this.options.guidedScrolling) {
             this.scrollLock.go('lock');
-            this.$element.on('sectionchange.confessional', this.expandedScrollHandler.bind(this));
+            this.$element.on('sectionchange.taxi', this.expandedScrollHandler.bind(this));
         }
     };
 
-    Confessional.prototype.draw = function() {
+    Taxi.prototype.draw = function() {
         // Sizes and positions the sections
         // and caches the section data in this.sectionData.
         // Call if a section is added or removed
@@ -32,14 +32,14 @@
         var viewportHeight = $(window).height();
         var sections = this.$element.children(this.options.sectionSelector);
         var currentPosition = 0;
-        var confessional = this;
+        var taxi = this;
 
         sections.each(function(index, el){
             var $el = $(el);
             var section = {
                 element: $el,
                 top: currentPosition,
-                expanded: $el.hasClass(confessional.options.expandedSectionClass)
+                expanded: $el.hasClass(taxi.options.expandedSectionClass)
             };
 
             var height = (section.expanded) ? section.element.outerHeight() : viewportHeight;
@@ -64,7 +64,7 @@
         return this;
     };
 
-    Confessional.prototype.currentSection = function() {
+    Taxi.prototype.currentSection = function() {
         // returns the index of the section currently in view
         var scrollTop = $(document).scrollTop();
 
@@ -77,7 +77,7 @@
         return 0;  // catch negative scrolling browser behaviour
     };
 
-    Confessional.prototype.to = function(index) {
+    Taxi.prototype.to = function(index) {
         if (index >= this.sectionData.length) {
             $.error('Out of range: this instance only has ' + this.sectionData.length + ' sections');
         }
@@ -98,22 +98,22 @@
         return this;
     };
 
-    Confessional.prototype.previous = function() {
+    Taxi.prototype.previous = function() {
         var cur = this.currentSection();
         return (cur > 0) ? this.to(cur-1) : false;
     };
 
-    Confessional.prototype.next = function() {
+    Taxi.prototype.next = function() {
         var cur = this.currentSection();
         return (cur < this.sectionData.length -1) ? this.to(cur+1) : false;
     };
 
-    Confessional.prototype.transform = function(x) {
+    Taxi.prototype.transform = function(x) {
         var that = this;
         this.scrollLock.go('lock');
         this.preventScroll = true;
 
-        $.fn.confessional.transform(this.$element, x, this.options).done(function(){
+        $.fn.taxi.transform(this.$element, x, this.options).done(function(){
             that.preventScroll = false;
             !that.options.guidedScrolling && that.scrollLock.go('unlock');
             that.checkSectionChange();
@@ -122,16 +122,16 @@
         return this;
     };
 
-    Confessional.prototype.checkSectionChange = function() {
+    Taxi.prototype.checkSectionChange = function() {
         var currentSection = this.currentSection();
         if (this._currentSection != currentSection) {
-            this.$element.trigger('sectionchange.confessional', [currentSection])
+            this.$element.trigger('sectionchange.taxi', [currentSection])
         }
         this._currentSection = currentSection;
     };
 
 
-    Confessional.prototype.movementHandler = function(e, direction) {
+    Taxi.prototype.movementHandler = function(e, direction) {
         if (this.options.guidedScrolling && !this.expandedScrollingMode) {
             if (!this.preventScroll) {
                 if (direction == 'up') { this.previous(); }
@@ -140,7 +140,7 @@
         }
     };
 
-    Confessional.prototype.expandedScrollHandler = function(e, index) {
+    Taxi.prototype.expandedScrollHandler = function(e, index) {
         if (this.sectionData[index].expanded) {
 
             /* Checks to ensure that the expanded scrolling section
@@ -178,7 +178,7 @@
 
     };
 
-    Confessional.prototype.publicMethods = [
+    Taxi.prototype.publicMethods = [
         'draw',
         'to',
         'next',
@@ -215,21 +215,21 @@
     // Plugin definition
     // =================
 
-    $.fn.confessional = function(option) {
+    $.fn.taxi = function(option) {
         var nargs = Array.prototype.slice.call(arguments, 1);
         return this.each(function(){
             var $this = $(this);
-            var data = $this.data('jquery.confessional');
-            var options = $.extend({}, $.fn.confessional.defaults, typeof option == 'object' && option);
+            var data = $this.data('jquery.taxi');
+            var options = $.extend({}, $.fn.taxi.defaults, typeof option == 'object' && option);
 
             if (!data) {
-                $this.data('jquery.confessional', (data = new Confessional(this, options)));
+                $this.data('jquery.taxi', (data = new Taxi(this, options)));
             } else {
                 if (option) {
                     if (typeof option == 'string' && data.publicMethods.indexOf(option) > -1) {
                         return data[option].apply(data, nargs);
                     } else {
-                        $.error('Method ' +  option + ' does not exist on jQuery.confessional');
+                        $.error('Method ' +  option + ' does not exist on jQuery.taxi');
                     }
                 }
             }
@@ -246,7 +246,7 @@
     being scrolled to. Returns a jQuery promise object which is resolved upon
     completion of the animations.
     */
-    $.fn.confessional.transform = function(element, x, options) {
+    $.fn.taxi.transform = function(element, x, options) {
         var dfd = $.Deferred();
 
         var currentPos = $(document).scrollTop();
@@ -273,11 +273,11 @@
         return dfd.promise();
     };
 
-    $.fn.confessional.defaults = {
+    $.fn.taxi.defaults = {
         sectionSelector: 'section',
         expandedSectionClass: 'expanded',
         guidedScrolling: true,
-        scrollSpeed: 700
+        scrollSpeed: 1000
     };
 
 })(jQuery);

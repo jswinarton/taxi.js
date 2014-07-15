@@ -2,21 +2,25 @@
     'use strict';
 
     var Confessional = function(element, options) {
+        var that = this;
         this.$element = $(element);
         this.options = options;
         this.sectionData = [];
         this.scrollLock = new ScrollLock();
-        this.transforming = false;
+        this.preventScroll = false;
+        this.expandedScrollingMode = false;
 
         $('body').css('margin', 0);
         this.$element.css('position', 'relative');
-        this.options.guidedScrolling && this.scrollLock.go('lock');
 
         this.draw();
         $(window).resize(this.draw.bind(this));
         $(document).on('movement', this.movementHandler.bind(this));
 
-        this._currentSection = this.currentSection();
+        if (this.options.guidedScrolling) {
+            this.scrollLock.go('lock');
+            this.$element.on('sectionchange.confessional', this.expandedScrollHandler.bind(this));
+        }
     };
 
     Confessional.prototype.draw = function() {
@@ -37,9 +41,11 @@
                 top: currentPosition,
                 expanded: $el.hasClass(confessional.options.expandedSectionClass)
             };
-            sectionData.push(section);
 
             var height = (section.expanded) ? section.element.outerHeight() : viewportHeight;
+            section.height = height;
+
+            sectionData.push(section);
 
             section.element.css({
                 position: 'absolute',
@@ -76,9 +82,18 @@
             $.error('Out of range: this instance only has ' + this.sectionData.length + ' sections');
         }
 
-        if (this.transforming) { return false; }
+        if (this.preventScroll) { return false; }
 
-        var destination = parseInt(this.sectionData[index].element.css('top'));
+        // If the scroll direction is up, scroll to the bottom of the section
+        // instead of the top. Accounts for expanded sections
+        var cur = this.currentSection();
+        var section = this.sectionData[index];
+        if (cur < index) {
+            var destination = section.top;
+        } else {
+            var destination = section.top + section.height - $(window).height();
+        }
+
         this.transform(destination);
         return this;
     };
@@ -96,24 +111,15 @@
     Confessional.prototype.transform = function(x) {
         var that = this;
         this.scrollLock.go('lock');
-        this.transforming = true;
+        this.preventScroll = true;
 
         $.fn.confessional.transform(this.$element, x).done(function(){
-            that.transforming = false;
+            that.preventScroll = false;
             !that.options.guidedScrolling && that.scrollLock.go('unlock');
             that.checkSectionChange();
         });
 
         return this;
-    };
-
-    Confessional.prototype.movementHandler = function(e, direction) {
-        if (this.options.guidedScrolling) {
-            if (!this.transforming) {
-                if (direction == 'up') { this.previous(); }
-                else if (direction == 'down') { this.next(); }
-            }
-        }
     };
 
     Confessional.prototype.checkSectionChange = function() {
@@ -122,6 +128,55 @@
             this.$element.trigger('sectionchange.confessional', [currentSection])
         }
         this._currentSection = currentSection;
+    };
+
+
+    Confessional.prototype.movementHandler = function(e, direction) {
+        if (this.options.guidedScrolling && !this.expandedScrollingMode) {
+            if (!this.preventScroll) {
+                if (direction == 'up') { this.previous(); }
+                else if (direction == 'down') { this.next(); }
+            }
+        }
+    };
+
+    Confessional.prototype.expandedScrollHandler = function(e, index) {
+        if (this.sectionData[index].expanded) {
+
+            /* Checks to ensure that the expanded scrolling section
+               hasn't scrolled past the boundaries. If it has, revert to
+               regular scrolling mode and unbind itself
+             */
+            var checkOnScroll = (function() {
+                var viewportHeight = $(window).height();
+                var viewportTop = $(document).scrollTop();
+                var height = this.sectionData[index].height;
+                var top = this.sectionData[index].top;
+
+                var lowerLimit = viewportHeight + viewportTop > top + height;
+                var upperLimit = viewportTop < top;
+
+                if (upperLimit || lowerLimit) {
+                    this.expandedScrollingMode = false;
+                    // this.preventScroll = true;
+                    this.scrollLock.go('lock');
+                    $(document).off('scroll', checkOnScroll);
+
+                    if (upperLimit) {
+                        $(document).scrollTop(top);
+                    } else {
+                        $(document).scrollTop(top + height - viewportHeight);
+                    }
+
+
+                }
+            }).bind(this);
+
+            this.expandedScrollingMode = true;
+            this.scrollLock.go('unlock');
+            $(document).on('scroll', checkOnScroll);
+        }
+
     };
 
     Confessional.prototype.publicMethods = [
@@ -137,9 +192,12 @@
         this.isLocked = false;
         this.evtString = 'mousewheel.scrolllock DOMMouseScroll.scrolllock \
             MozMousePixelScroll.scrolllock touchstart.scrolllock \
-            touchmove.scrolllock keydown.scrolllock';
+            touchmove.scrolllock keydown.scrolllock'; // keydown.scrolllock';
         this.lockHandler = function(e) {
-            e.preventDefault();
+            var keycodes = [33, 32, 34, 37, 38, 39, 40, 65, 68, 83, 87];
+            if (e.type !== 'keydown' || keycodes.indexOf(e.keyCode) > -1) {
+                e.preventDefault();
+            }
         }
     };
 

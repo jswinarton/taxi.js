@@ -1,0 +1,28 @@
+{
+  "name": "taxi",
+  "title": "Taxi.js",
+  "description": "",
+  "version": "0.0.0",
+  "main": "dist/taxi.js",
+  "homepage": "http://github.com/jswinarton/taxi.js",
+  "author": {
+    "name": "Jeremy Swinarton"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jswinarton/taxi.js"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jswinarton/taxi.js/blob/master/LICENSE.txt"
+    }
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "uglify-js": "2.4.14"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/uglifyjs src/taxi-movement.js src/taxi.js -o dist/taxi.js -m"
+  }
+}

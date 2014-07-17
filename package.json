@@ -23,6 +23,6 @@
     "uglify-js": "2.4.14"
   },
   "scripts": {
-    "build": "./node_modules/.bin/uglifyjs src/taxi-movement.js src/taxi.js -o dist/taxi.js -m"
+    "build": "./node_modules/.bin/uglifyjs src/taxi-movement.js src/taxi.js -o dist/taxi.min.js -m"
   }
 }

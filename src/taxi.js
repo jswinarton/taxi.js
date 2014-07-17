@@ -153,20 +153,24 @@
                 var height = this.sectionData[index].height;
                 var top = this.sectionData[index].top;
 
-                var lowerLimit = viewportHeight + viewportTop > top + height;
-                var upperLimit = viewportTop < top;
+                var lowerLimit = viewportHeight + viewportTop > top + height + this.options.expandedScrollOffThreshold;
+                var upperLimit = viewportTop < top - this.options.expandedScrollOffThreshold;
 
                 if (upperLimit || lowerLimit) {
                     this.expandedScrollingMode = false;
                     this.scrollLock.go('lock');
                     $(document).off('scroll', checkOnScroll);
 
-                    if (upperLimit) {
-                        $(document).scrollTop(top);
-                    } else {
-                        $(document).scrollTop(top + height - viewportHeight);
-                    }
 
+                    // We need a solution to scroll to the top of a certain section
+                    // if it's halfway between sections
+                    // because the below code now does nothing
+
+                    // if (upperLimit) {
+                    //     $(document).scrollTop(top - this.options.expandedScrollOffThreshold);
+                    // } else {
+                    //     $(document).scrollTop(top + height - viewportHeight + this.options.expandedScrollOffThreshold);
+                    // }
 
                 }
             }).bind(this);
@@ -242,34 +246,41 @@
     /*
     The built in transform function uses CSS3 transitions for better
     performance. You can override this method with your own implementation.
-    The transform method accepts one argument, which is the pixel position
-    being scrolled to. Returns a jQuery promise object which is resolved upon
+    The transform method takes three arguments:
+        element — the parent element that contains the sections
+        x — the pixel position being scrolled to
+        options — an object containing user-specified options
+    The method should return a jQuery promise object that is resolved upon
     completion of the animations.
     */
+
     $.fn.taxi.transform = function(element, x, options) {
         var dfd = $.Deferred();
 
         var currentPos = $(document).scrollTop();
         var delta = x - currentPos;
-        var transitionString = 'all ' + options.scrollSpeed + 'ms ease';
+        var transitionString = options.scrollSpeed + 'ms ease';
+        var transformString = 'translate(0, ' + delta + 'px)';
 
         $(window).scrollTop(x);
-
-        element.css('margin-top', delta);
+        element.css({
+            '-webkit-transform': transformString,
+            'transform': transformString
+        })
         element[0].offsetHeight; // trigger reflow, flush CSS
         element.css({
-            '-webkit-transition': transitionString,
+            'transform': 'translate(0, 0)',
+            '-webkit-transform': 'translate(0, 0)',
             'transition': transitionString,
-            'margin-top': 0
+            '-webkit-transition': transitionString
         });
         element[0].offsetHeight; // trigger reflow, flush CSS
         element.css({
-            '-webkit-transition': 'all 0ms ease',
-            'transition': 'all 0ms ease',
+            '-webkit-transition': '0ms ease',
+            'transition': '0ms ease',
         });
 
         element.one('transitionend webkitTransitionEnd', dfd.resolve);
-
         return dfd.promise();
     };
 
@@ -277,7 +288,8 @@
         sectionSelector: 'section',
         expandedSectionClass: 'expanded',
         guidedScrolling: true,
-        scrollSpeed: 1000
+        scrollSpeed: 1000,
+        expandedScrollOffThreshold: 200
     };
 
 })(jQuery);

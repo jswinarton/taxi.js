@@ -14,7 +14,7 @@
     <body>
         <div id="taxi">
             <section style="background:#eee"></section>
-            <section style="background:#ccc" class="expanded">
+            <!-- <section style="background:#ccc" class="expanded">
                 1<br>
                 2<br>
                 3<br>
@@ -174,17 +174,20 @@
                 3<br>
                 2<br>
                 1<br>
-            </section>
+            </section> -->
             <section style="background:#aaa"></section>
             <section style="background:#999"></section>
             <section style="background:#666"></section>
         </div>
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        <script src="../dist/taxi.js"></script>
+        <script src="../src/taxi-movement.js"></script>
+        <script src="../src/taxi.js"></script>
 
         <script type="text/javascript">
             $(function(){
-                window.taxiDemo = $('#taxi').taxi();
+                window.taxiDemo = $('#taxi').taxi({
+                    // guidedScrolling: false
+                });
 
                 taxiDemo.on('sectionchange.taxi', function(e, index){
                     console.log('taxi section change', index);

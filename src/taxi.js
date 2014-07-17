@@ -28,20 +28,21 @@
         // and caches the section data in this.sectionData.
         // Call if a section is added or removed
 
+        var that = this;
         var sectionData = [];
         var viewportHeight = $(window).height();
         var sections = this.$element.children(this.options.sectionSelector);
         var currentPosition = 0;
-        var taxi = this;
 
         sections.each(function(index, el){
             var $el = $(el);
             var section = {
                 element: $el,
                 top: currentPosition,
-                expanded: $el.hasClass(taxi.options.expandedSectionClass)
+                expanded: $el.hasClass(that.options.expandedSectionClass)
             };
 
+            $el.css('height', 'auto');  // ensure appropriate measurement when redrawing
             var height = (section.expanded) ? section.element.outerHeight() : viewportHeight;
             section.height = height;
 
@@ -60,6 +61,7 @@
         });
 
         this.sectionData = sectionData;
+        console.log(sectionData);
 
         return this;
     };
@@ -75,6 +77,17 @@
             }
         }
         return 0;  // catch negative scrolling browser behaviour
+    };
+
+    Taxi.prototype.snap = function() {
+        var scrollTop = $(document).scrollTop();
+        var currentSection = this.currentSection();
+        var currentSectionData = this.sectionData[currentSection];
+
+        if (scrollTop != currentSectionData.top) {
+            this.to(currentSection);
+        }
+
     };
 
     Taxi.prototype.to = function(index) {
@@ -98,28 +111,82 @@
         return this;
     };
 
-    Taxi.prototype.previous = function() {
+    Taxi.prototype.previous = function(scrollToBottom) {
+        scrollToBottom = (typeof scrollToBottom === 'boolean') ? scrollToBottom : false;
+
         var cur = this.currentSection();
-        return (cur > 0) ? this.to(cur-1) : false;
+        return (cur > 0) ? this.to(cur-1) : this.snap();
     };
 
-    Taxi.prototype.next = function() {
+    Taxi.prototype.next = function(scrollToBottom) {
+        scrollToBottom = (typeof scrollToBottom === 'boolean') ? scrollToBottom : false;
+
         var cur = this.currentSection();
-        return (cur < this.sectionData.length -1) ? this.to(cur+1) : false;
+        return (cur < this.sectionData.length -1) ? this.to(cur+1) : this.snap();
     };
 
     Taxi.prototype.transform = function(x) {
+        // TODO: add checks to ensure x is between 0 and page height
         var that = this;
+        var dfd = $.Deferred();
         this.scrollLock.go('lock');
         this.preventScroll = true;
 
         $.fn.taxi.transform(this.$element, x, this.options).done(function(){
             that.preventScroll = false;
-            !that.options.guidedScrolling && that.scrollLock.go('unlock');
+            if (!that.options.guidedScrolling) that.scrollLock.go('unlock');
             that.checkSectionChange();
+            dfd.resolve();
         });
 
-        return this;
+        return dfd.promise();
+    };
+
+    Taxi.prototype.toggleExpanded = function(index) {
+        // sections with overflowing content can be turned into
+        // expanded or non-expanded sections on the fly
+        var that = this;
+        var section = this.sectionData[index];
+        var currentSection = this.currentSection();
+        var delta = section.element[0].scrollHeight - $(window).height();
+        var currentScroll = $(document).scrollTop();
+
+        if (section.expanded) {
+
+            if (currentSection == index) {
+                // Scroll the window back to the top of the section before
+                // closing it
+                this.transform(section.top).done(function(){
+                    section.element.removeClass('expanded');
+                    that.draw();
+                    that.expandedScrollingMode = false;
+                });
+            } else if (currentSection > index) {
+                // Offset the scroll value by the amount the window size
+                // changes to keep the window in the same place
+
+                $(document).scrollTop(currentScroll - delta);
+                section.element.removeClass('expanded');
+                that.draw();
+
+            } else {
+                section.element.removeClass('expanded');
+                that.draw();
+            }
+
+        } else {
+
+            section.element.addClass('expanded');
+            that.draw();
+
+            if (currentSection == index) {
+                that.expandedScrollHandler(null, index);
+            } else if (currentSection > index) {
+                $(document).scrollTop(currentScroll + delta);
+            }
+        }
+
+
     };
 
     Taxi.prototype.checkSectionChange = function() {
@@ -132,6 +199,7 @@
 
 
     Taxi.prototype.movementHandler = function(e, direction) {
+        console.log('movement', this.expandedScrollingMode);
         if (this.options.guidedScrolling && !this.expandedScrollingMode) {
             if (!this.preventScroll) {
                 if (direction == 'up') { this.previous(); }
@@ -162,16 +230,6 @@
                     $(document).off('scroll', checkOnScroll);
 
 
-                    // We need a solution to scroll to the top of a certain section
-                    // if it's halfway between sections
-                    // because the below code now does nothing
-
-                    // if (upperLimit) {
-                    //     $(document).scrollTop(top - this.options.expandedScrollOffThreshold);
-                    // } else {
-                    //     $(document).scrollTop(top + height - viewportHeight + this.options.expandedScrollOffThreshold);
-                    // }
-
                 }
             }).bind(this);
 
@@ -184,10 +242,12 @@
 
     Taxi.prototype.publicMethods = [
         'draw',
-        'to',
         'next',
         'previous',
-        'currentSection'
+        'snap',
+        'to',
+        'toggleExpanded'
+        // 'transform'
     ];
 
 

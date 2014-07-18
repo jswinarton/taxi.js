@@ -150,9 +150,16 @@
         return dfd.promise();
     };
 
-    Taxi.prototype.toggleExpanded = function(index) {
+    Taxi.prototype.toggleExpanded = function(indexOrElement) {
         // sections with overflowing content can be turned into
         // expanded or non-expanded sections on the fly
+
+        if (typeof indexOrElement === "number") {
+            var index = indexOrElement;
+        } else {
+            var index = this.$element.children().index(indexOrElement);
+        }
+
         var that = this;
         var section = this.sectionData[index];
         var currentSection = this.currentSection();

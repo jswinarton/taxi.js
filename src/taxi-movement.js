@@ -1,3 +1,10 @@
+/**
+ * taxi-movement.js
+ * A helper event that detects swipe-like events from multiple input sources.
+ * Swipe events from touch screen devices, a subset of keyboard events and simulated
+ * swipe events from trackpads and mousewheels will fire 'movement' events.
+ *
+ */
 ;(function($){
 
     var previousTouchStart = [];

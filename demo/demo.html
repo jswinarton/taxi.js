@@ -14,7 +14,7 @@
     <body>
         <div id="taxi">
             <section style="background:#eee"></section>
-            <section style="background:#ccc">
+            <section style="background:#ccc" class="expanded">
                 <div data-taxi-full-height>Test to fix up the height</div>
                 1<br>
                 2<br>
@@ -190,9 +190,17 @@
                     // guidedScrolling: false
                 });
 
-                taxiDemo.on('sectionchange.taxi', function(e, index){
-                    console.log('taxi section change', index);
-                })
+                taxiDemo
+                    .on('sectionchange.taxi', function(e, index){
+                        console.log('taxi section change', index);
+                    })
+                    .on('transform.start.taxi', function(e) {
+                        console.log('taxi transform start');
+                    })
+                    .on('transform.end.taxi', function(e) {
+                        console.log('taxi transform end');
+                    })
+
             });
         </script>
     </body>

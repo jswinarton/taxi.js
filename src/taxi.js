@@ -153,7 +153,8 @@
     };
 
 
-    //
+    /* Aligns the top of the current section to the top of the viewport
+    */
     Taxi.prototype.snap = function() {
         var scrollTop = $(document).scrollTop();
         var currentSection = this._currentSection();
@@ -166,7 +167,11 @@
         return this;
     };
 
-
+    /* Transforms the top of the current section to the top of the viewport.
+       If scrollToBottom is true, the bottom of the current section is aligned to the
+       bottom of the viewport. (This only makes a difference for expanded sections.
+       For sections where the height matches the viewport height, )
+    */
     Taxi.prototype.to = function(index, scrollToBottom) {
         if (index >= this.sectionData.length) {
             $.error('Out of range: this instance only has ' + this.sectionData.length + ' sections');
@@ -193,13 +198,13 @@
 
     Taxi.prototype.previous = function(scrollToBottom) {
         var cur = this._currentSection();
-        return (cur > 0) ? this.to(cur - 1, scrollToBottom) : this.snap();
+        return (cur > 0) ? this.to(cur - 1, scrollToBottom);
     };
 
 
     Taxi.prototype.next = function(scrollToBottom) {
         var cur = this._currentSection();
-        return (cur < this.sectionData.length - 1) ? this.to(cur + 1, scrollToBottom) : this.snap();
+        return (cur < this.sectionData.length - 1) ? this.to(cur + 1, scrollToBottom);
     };
 
     /** The main driver for simulated page scrolls. Accepts a pixel value
@@ -230,11 +235,14 @@
         return dfd.promise();
     };
 
-
+    /** Sections with overflowing content can be turned into
+     *  expanded or non-expanded sections on the fly
+     *
+     * TODO: rewrite this as Taxi.prototype.expanded(method)
+     * which accepts method as a string with values 'expand',
+     * 'collapse', or 'toggle'
+     */
     Taxi.prototype.toggleExpanded = function(indexOrElement) {
-        // sections with overflowing content can be turned into
-        // expanded or non-expanded sections on the fly
-
         if (typeof indexOrElement === "number") {
             var index = indexOrElement;
         } else {
@@ -285,6 +293,11 @@
     };
 
 
+    /** ScrollLock toggle's the user's ability to scroll manually,
+     *  by scroll wheels, touch events and key presses.
+     *  Call ScrollLock.go('lock') to disable scrolling
+     *  and ScrollLock.go('unlock') to reenable.
+     */
     var ScrollLock = function(){
         this.isLocked = false;
         this.evtString = 'mousewheel.scrolllock DOMMouseScroll.scrolllock \

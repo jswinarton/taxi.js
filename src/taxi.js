@@ -21,6 +21,10 @@
             this.scrollLock.go('lock');
             this.$element.on('sectionchange.taxi', this.expandedScrollHandler.bind(this));
         }
+
+        if (this.options.hideScrollbar) {
+            $("<style type='text/css'>::-webkit-scrollbar { display: none; }</style>").appendTo('head');
+        }
     };
 
     Taxi.prototype.draw = function() {
@@ -60,8 +64,12 @@
 
         });
 
+
+        // If a descendent element of a section has a taxi-full-height data attribute,
+        // it will be assigned the height of the viewport.
+        sections.find('[data-taxi-full-height]').css('height', viewportHeight);
+
         this.sectionData = sectionData;
-        console.log(sectionData);
 
         return this;
     };
@@ -199,7 +207,6 @@
 
 
     Taxi.prototype.movementHandler = function(e, direction) {
-        console.log('movement', this.expandedScrollingMode);
         if (this.options.guidedScrolling && !this.expandedScrollingMode) {
             if (!this.preventScroll) {
                 if (direction == 'up') { this.previous(); }
@@ -349,7 +356,8 @@
         expandedSectionClass: 'expanded',
         guidedScrolling: true,
         scrollSpeed: 1000,
-        expandedScrollOffThreshold: 200
+        expandedScrollOffThreshold: 200,
+        hideScrollbar: true
     };
 
 })(jQuery);

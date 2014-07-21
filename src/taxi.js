@@ -305,7 +305,6 @@
             }
         };
 
-        console.log(method, section.expanded);
         if (!section.expanded &&
             (method == 'expand' || method == 'toggle')) {
             _expand();

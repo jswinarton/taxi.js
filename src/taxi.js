@@ -46,7 +46,7 @@
         Drives transform events based on swipe-like events from user input.
     */
     Taxi.prototype._movementHandler = function(e, direction) {
-        if (!this.expandedScrollingMode) {
+        if (!this.expandedScrollingMode && !this.preventTransform) {
             if (direction == 'up') { this.previous(true); }
             else if (direction == 'down') { this.next(); }
         }
@@ -91,7 +91,6 @@
     /** Returns the index of the section currently in view.
     */
     Taxi.prototype._currentSection = function() {
-        console.log('currentsection')
         var scrollTop = $(document).scrollTop();
 
         var i = this.sectionData.length;
@@ -161,7 +160,7 @@
         var currentSectionData = this.sectionData[currentSection];
 
         if (scrollTop != currentSectionData.top) {
-            this.to(currentSection);
+            this.transform(currentSectionData.top);
         }
 
         return this;
@@ -198,13 +197,15 @@
 
     Taxi.prototype.previous = function(scrollToBottom) {
         var cur = this._currentSection();
-        return (cur > 0) ? this.to(cur - 1, scrollToBottom);
+        var index = (cur > 0) ? cur - 1 : cur;
+        return this.to(index, scrollToBottom);
     };
 
 
     Taxi.prototype.next = function(scrollToBottom) {
         var cur = this._currentSection();
-        return (cur < this.sectionData.length - 1) ? this.to(cur + 1, scrollToBottom);
+        var index = (cur < this.sectionData.length - 1) ? cur + 1 : cur;
+        return this.to(index, scrollToBottom);
     };
 
     /** The main driver for simulated page scrolls. Accepts a pixel value

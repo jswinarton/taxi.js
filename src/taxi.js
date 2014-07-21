@@ -166,6 +166,7 @@
         return this;
     };
 
+
     /* Transforms the top of the current section to the top of the viewport.
        If scrollToBottom is true, the bottom of the current section is aligned to the
        bottom of the viewport. (This only makes a difference for expanded sections.
@@ -187,8 +188,6 @@
         } else {
             var destination = section.top;
         }
-
-        if ($(document).scrollTop() == destination) return false;
 
         this.$element.trigger('moveto.start.taxi', [index]);
         this.transform(destination).done(function(){
@@ -212,59 +211,82 @@
     };
 
     /** The main driver for simulated page scrolls. Accepts a pixel value
-     *  which is scrolled to the top of the page. Calls to transform are ignored
+     *  which is scrolled to the top of the page. Calls to transform fail
      *  when preventTransform is true. The engine that drives animations is
-     *  $.fn.taxi.transform.
+     *  $.fn.taxi.transform. Returns a jQuery promise object.
      */
     Taxi.prototype.transform = function(x) {
-        if (this.preventTransform ||
-            x < 0 ||
-            x > $(document).height()) { return false; }
-
         var that = this;
         var dfd = $.Deferred();
 
-        this.$element.trigger('transform.start.taxi');
-        this.preventTransform = true;
-        if (!this.options.guidedScrolling) this.scrollLock.go('lock');
+        // The transform fails if it is out of bounds or
+        // if preventTransform is true
+        if (this.preventTransform ||
+            x < 0 ||
+            x > $(document).height()) {
+            dfd.reject();
+        }
 
-        $.fn.taxi.transform(this.$element, x, this.options).done(function(){
-            that.preventTransform = false;
-            that._sectionChangeHandler();
-            if (!that.options.guidedScrolling) that.scrollLock.go('unlock');
+        // If the transform delta is 0, resolve immediately
+        else if ($(document).scrollTop() == x) {
             dfd.resolve();
-            that.$element.trigger('transform.end.taxi');
-        });
+        }
+
+        // Do the transform
+        else {
+
+            this.$element.trigger('transform.start.taxi');
+            this.preventTransform = true;
+            if (!this.options.guidedScrolling) this.scrollLock.go('lock');
+
+            $.fn.taxi.transform(this.$element, x, this.options).done(function(){
+                that.preventTransform = false;
+                that._sectionChangeHandler();
+                if (!that.options.guidedScrolling) that.scrollLock.go('unlock');
+                dfd.resolve();
+                that.$element.trigger('transform.end.taxi');
+            });
+
+        }
 
         return dfd.promise();
     };
 
+
     /** Sections with overflowing content can be turned into
      *  expanded or non-expanded sections on the fly
-     *
-     * TODO: rewrite this as Taxi.prototype.expanded(method)
-     * which accepts method as a string with values 'expand',
-     * 'collapse', or 'toggle'
+     *  Pass a method as 'expand', 'collapse' or 'toggle'
+     *  and an index which is either the numeric index of the section
+     *  within $element, or the element itself
      */
-    Taxi.prototype.toggleExpanded = function(indexOrElement) {
-        if (typeof indexOrElement === "number") {
-            var index = indexOrElement;
-        } else {
-            var index = this.$element.children().index(indexOrElement);
-        }
-
+    Taxi.prototype.expand = function(method, indexOrElement) {
         var that = this;
+
+        var index = (typeof indexOrElement === "number") ?
+            indexOrElement :
+            this.$element.children().index(indexOrElement);
+
         var section = this.sectionData[index];
         var currentSection = this._currentSection();
         var delta = section.element[0].scrollHeight - $(window).height();
         var currentScroll = $(document).scrollTop();
 
-        if (section.expanded) {
+        var _expand = function() {
+            section.element.addClass('expanded');
+            that.draw();
 
+            if (currentSection == index) {
+                that._expandedScrollHandler(null, index);
+            } else if (currentSection > index) {
+                $(document).scrollTop(currentScroll + delta);
+            }
+        };
+
+        var _collapse = function() {
             if (currentSection == index) {
                 // Scroll the window back to the top of the section before
                 // closing it
-                this.transform(section.top).done(function(){
+                that.transform(section.top).done(function(){
                     section.element.removeClass('expanded');
                     that.draw();
                     that.expandedScrollingMode = false;
@@ -281,20 +303,19 @@
                 section.element.removeClass('expanded');
                 that.draw();
             }
+        };
 
-        } else {
-
-            section.element.addClass('expanded');
-            that.draw();
-
-            if (currentSection == index) {
-                that._expandedScrollHandler(null, index);
-            } else if (currentSection > index) {
-                $(document).scrollTop(currentScroll + delta);
-            }
+        console.log(method, section.expanded);
+        if (!section.expanded &&
+            (method == 'expand' || method == 'toggle')) {
+            _expand();
+        } else if (section.expanded &&
+            (method == 'collapse' || method == 'toggle')) {
+            _collapse();
         }
 
-    };
+        return this;
+    }
 
 
     /** ScrollLock toggle's the user's ability to scroll manually,

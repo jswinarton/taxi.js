@@ -194,11 +194,17 @@
                     .on('sectionchange.taxi', function(e, index){
                         console.log('taxi section change', index);
                     })
-                    .on('transform.start.taxi', function(e) {
-                        console.log('taxi transform start');
+                    // .on('transform.start.taxi', function(e) {
+                    //     console.log('taxi transform start');
+                    // })
+                    // .on('transform.end.taxi', function(e) {
+                    //     console.log('taxi transform end');
+                    // })
+                    .on('moveto.start.taxi', function(e, index) {
+                        console.log('moving to section', index);
                     })
-                    .on('transform.end.taxi', function(e) {
-                        console.log('taxi transform end');
+                    .on('moveto.end.taxi', function(e, index) {
+                        console.log('done moving to section', index);
                     });
 
             });

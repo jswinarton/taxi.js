@@ -172,6 +172,8 @@
        For sections where the height matches the viewport height, )
     */
     Taxi.prototype.to = function(index, scrollToBottom) {
+        var that = this;
+
         if (index >= this.sectionData.length) {
             $.error('Out of range: this instance only has ' + this.sectionData.length + ' sections');
         }
@@ -180,17 +182,18 @@
         var section = this.sectionData[index];
         scrollToBottom = (typeof scrollToBottom === 'boolean') ? scrollToBottom : false;
 
-        if (cur == index) {
-            return this.snap();
-        }
-
         if (scrollToBottom) {
             var destination = section.top + section.height - $(window).height();
         } else {
             var destination = section.top;
         }
 
-        this.transform(destination);
+        if ($(document).scrollTop() == destination) return false;
+
+        this.$element.trigger('moveto.start.taxi', [index]);
+        this.transform(destination).done(function(){
+            that.$element.trigger('moveto.end.taxi', [index]);
+        });
         return this;
     };
 

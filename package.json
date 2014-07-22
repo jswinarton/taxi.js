@@ -2,7 +2,7 @@
   "name": "taxi",
   "title": "Taxi.js",
   "description": "Quickly and easily create extensible pages with guided scrolling.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/taxi.js",
   "homepage": "http://github.com/jswinarton/taxi.js",
   "author": {

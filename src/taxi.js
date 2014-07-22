@@ -26,6 +26,12 @@
         if (this.options.hideScrollbar) {
             $("<style type='text/css'>::-webkit-scrollbar { display: none; }</style>").appendTo('head');
         }
+
+        // $(document).on('scroll', checkOnScroll);
+        var that = this;
+        $(document).on('movement', function(){
+            console.log(that._currentSection());
+        })
     };
 
 
@@ -76,6 +82,11 @@
                     this.scrollLock.go('lock');
                     $(document).off('scroll', checkOnScroll);
 
+                    if (upperLimit) {
+                        this.to(index - 1, true, index);
+                    } else {
+                        this.to(index + 1, false, index);
+                    }
 
                 }
             }).bind(this);
@@ -89,13 +100,19 @@
 
 
     /** Returns the index of the section currently in view.
+        Accounts for the extra scroll threshold surrounding
+        expanded sections.
     */
     Taxi.prototype._currentSection = function() {
         var scrollTop = $(document).scrollTop();
 
         var i = this.sectionData.length;
         while(i--) {
-            if (scrollTop >= this.sectionData[i].top) {
+            var thisSection = this.sectionData[i];
+            if (thisSection.expanded &&
+                scrollTop >= thisSection.top - this.options.expandedScrollOffThreshold ||
+                !thisSection.expanded &&
+                scrollTop >= thisSection.top) {
                 return i;
             }
         }
@@ -170,16 +187,20 @@
     /* Transforms the top of the current section to the top of the viewport.
        If scrollToBottom is true, the bottom of the current section is aligned to the
        bottom of the viewport. (This only makes a difference for expanded sections.
-       For sections where the height matches the viewport height, )
+       For sections where the height matches the viewport height, the resulting transform
+       will be the same).
+       Specify previousIndex to force the event handlers to return this value for the previous
+       index instead of the default currentSection. This only exists to fix a bug where the currentSection is sometimes reported incorrectly after scrolling out of an expanded
+       section. Its use for any other purpose is discouraged.
     */
-    Taxi.prototype.to = function(index, scrollToBottom) {
+    Taxi.prototype.to = function(index, scrollToBottom, previousIndex) {
         var that = this;
 
         if (index >= this.sectionData.length) {
             $.error('Out of range: this instance only has ' + this.sectionData.length + ' sections');
         }
 
-        var cur = this._currentSection();
+        var previousIndex = previousIndex || this._currentSection();
         var section = this.sectionData[index];
         scrollToBottom = (typeof scrollToBottom === 'boolean') ? scrollToBottom : false;
 
@@ -189,9 +210,9 @@
             var destination = section.top;
         }
 
-        this.$element.trigger('moveto.start.taxi', [index, cur]);
+        this.$element.trigger('moveto.start.taxi', [index, previousIndex]);
         this.transform(destination).done(function(){
-            that.$element.trigger('moveto.end.taxi', [index, cur]);
+            that.$element.trigger('moveto.end.taxi', [index, previousIndex]);
         });
         return this;
     };
@@ -268,7 +289,8 @@
 
         var section = this.sectionData[index];
         var currentSection = this._currentSection();
-        var delta = section.element[0].scrollHeight - $(window).height();
+        var delta = section.height - $(window).height();
+        // console.log(section, section.element[0].scrollHeight, delta);
         var currentScroll = $(document).scrollTop();
 
         var _expand = function() {

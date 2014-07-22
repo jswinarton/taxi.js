@@ -274,13 +274,18 @@
      *  Pass a method as 'expand', 'collapse' or 'toggle'
      *  and an index which is either the numeric index of the section
      *  within $element, or the element itself
+     *  If no element is passed, the current section is assumed
      */
     Taxi.prototype.expand = function(method, indexOrElement) {
         var that = this;
 
-        var index = (typeof indexOrElement === "number") ?
-            indexOrElement :
-            this.$element.children().index(indexOrElement);
+        if (!indexOrElement) {
+            var index = this._currentSection();
+        } else if (typeof indexOrElement === "number") {
+            var index = indexOrElement;
+        } else {
+            var index = this.$element.children().index(indexOrElement);
+        }
 
         var section = this.sectionData[index];
         var currentSection = this._currentSection();

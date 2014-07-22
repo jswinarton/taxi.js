@@ -27,11 +27,6 @@
             $("<style type='text/css'>::-webkit-scrollbar { display: none; }</style>").appendTo('head');
         }
 
-        // $(document).on('scroll', checkOnScroll);
-        var that = this;
-        $(document).on('movement', function(){
-            console.log(that._currentSection());
-        })
     };
 
 
@@ -290,7 +285,6 @@
         var section = this.sectionData[index];
         var currentSection = this._currentSection();
         var delta = section.height - $(window).height();
-        // console.log(section, section.element[0].scrollHeight, delta);
         var currentScroll = $(document).scrollTop();
 
         var _expand = function() {

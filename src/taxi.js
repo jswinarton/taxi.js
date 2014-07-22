@@ -281,7 +281,7 @@
                 $(document).scrollTop(currentScroll + delta);
             }
 
-            this.$element.trigger('sectionexpand.taxi', [index]);
+            that.$element.trigger('sectionexpand.taxi', [index]);
         };
 
         var _collapse = function() {
@@ -292,7 +292,7 @@
                     section.element.removeClass('expanded');
                     that.draw();
                     that.expandedScrollingMode = false;
-                    this.$element.trigger('sectioncollapse.taxi', [index]);
+                    that.$element.trigger('sectioncollapse.taxi', [index]);
                 });
             } else if (currentSection > index) {
                 // Offset the scroll value by the amount the window size
@@ -301,12 +301,12 @@
                 $(document).scrollTop(currentScroll - delta);
                 section.element.removeClass('expanded');
                 that.draw();
-                this.$element.trigger('sectioncollapse.taxi', [index]);
+                that.$element.trigger('sectioncollapse.taxi', [index]);
 
             } else {
                 section.element.removeClass('expanded');
                 that.draw();
-                this.$element.trigger('sectioncollapse.taxi', [index]);
+                that.$element.trigger('sectioncollapse.taxi', [index]);
             }
         };
 

@@ -26,13 +26,12 @@
         if (this.options.hideScrollbar) {
             $("<style type='text/css'>::-webkit-scrollbar { display: none; }</style>").appendTo('head');
         }
-
     };
 
 
     /** Fire events when the section changes.
         Called after transforms complete and on scroll events when
-        guidedScrolling is false
+        guidedScrolling is false.
     */
     Taxi.prototype._sectionChangeHandler = function() {
         var currentSection = this._currentSection();

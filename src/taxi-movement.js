@@ -81,15 +81,15 @@
             $(this)
                 .on('mousewheel DOMMouseScroll MozMousePixelScroll', wheelMove)
                 .on('touchstart', touchStart)
-                .on('touchmove', touchMove)
-                .on('keydown', keyDown);
+                .on('touchmove', touchMove);
+                // .on('keydown', keyDown);
         },
         remove: function(handleObj) {
             $(this)
                 .off('mousewheel DOMMouseScroll MozMousePixelScroll', wheelMove)
                 .off('touchstart', touchStart)
-                .off('touchmove', touchMove)
-                .off('keydown', keyDown);
+                .off('touchmove', touchMove);
+                // .off('keydown', keyDown);
         }
     };
 

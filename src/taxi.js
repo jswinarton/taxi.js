@@ -351,12 +351,12 @@
         this.isLocked = false;
         this.evtString = 'mousewheel.scrolllock DOMMouseScroll.scrolllock \
             MozMousePixelScroll.scrolllock touchstart.scrolllock \
-            touchmove.scrolllock keydown.scrolllock'; // keydown.scrolllock';
+            touchmove.scrolllock'; // keydown.scrolllock';
         this.lockHandler = function(e) {
-            var keycodes = [33, 32, 34, 37, 38, 39, 40, 65, 68, 83, 87];
-            if (e.type !== 'keydown' || keycodes.indexOf(e.keyCode) > -1) {
+            // var keycodes = [33, 32, 34, 37, 38, 39, 40, 65, 68, 83, 87];
+            // if (e.type !== 'keydown' || keycodes.indexOf(e.keyCode) > -1) {
                 e.preventDefault();
-            }
+            // }
         }
     };
 

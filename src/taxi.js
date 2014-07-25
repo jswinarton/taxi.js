@@ -349,29 +349,20 @@
      */
     var ScrollLock = function(){
         this.isLocked = false;
-        this.evtString = 'mousewheel.scrolllock DOMMouseScroll.scrolllock \
-            MozMousePixelScroll.scrolllock touchstart.scrolllock \
-            touchmove.scrolllock'; // keydown.scrolllock';
-        this.lockHandler = function(e) {
-            // var keycodes = [33, 32, 34, 37, 38, 39, 40, 65, 68, 83, 87];
-            // if (e.type !== 'keydown' || keycodes.indexOf(e.keyCode) > -1) {
-                e.preventDefault();
-            // }
-        }
     };
 
 
-    ScrollLock.prototype.go = function(action) {
+    ScrollLock.prototype.go = function(action){
         if (!action) return this.isLocked;
 
         if (action == 'lock' && !this.isLocked) {
-            $(document).on(this.evtString, this.lockHandler);
+            $('body').css('overflow', 'hidden');
             this.isLocked = true;
         } else if (action == 'unlock' && this.isLocked) {
-            $(document).off(this.evtString, this.lockHandler);
+            $('body').css('overflow', 'visible');
             this.isLocked = false;
         }
-    };
+    }
 
 
     // Plugin definition
@@ -428,14 +419,14 @@
             '-webkit-transform': transformString,
             'transform': transformString
         })
-        element[0].offsetHeight; // trigger reflow, flush CSS
+        element[0].offsetHeight; // trigger layout
         element.css({
             'transform': 'translate(0, 0)',
             '-webkit-transform': 'translate(0, 0)',
             'transition': transitionString,
             '-webkit-transition': transitionString
         });
-        element[0].offsetHeight; // trigger reflow, flush CSS
+        element[0].offsetHeight; // trigger layout
         element.css({
             '-webkit-transition': '0ms ease',
             'transition': '0ms ease',

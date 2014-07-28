@@ -220,6 +220,10 @@
                     // guidedScrolling: false
                 });
 
+                taxiDemo.on('movement', function(){
+                    console.log('movement');
+                })
+
                 // taxiDemo
                 //     .on('sectionchange.taxi', function(e, index, indexPrev){
                 //         console.log('taxi section change', index, indexPrev);

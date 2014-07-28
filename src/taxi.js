@@ -2,6 +2,7 @@
     'use strict';
 
     var Taxi = function(element, options) {
+        var that = this;
         this.$element = $(element);
         this.options = options;
         this.sectionData = [];  // populated on draw with objects of section metadata
@@ -25,6 +26,16 @@
 
         if (this.options.hideScrollbar) {
             $("<style type='text/css'>::-webkit-scrollbar { display: none; }</style>").appendTo('head');
+        }
+
+        if (this.options.bootstrapModalCompatibility) {
+            $('body').on('show.bs.modal', function() {
+                // console.log('showing a god damn modal');
+                that.preventTransform = true;
+            }).on('hide.bs.modal', function(){
+                // console.log('hiding a god damn modal');
+                that.preventTransform = false;
+            });
         }
     };
 
@@ -443,7 +454,8 @@
         guidedScrolling: true,
         scrollSpeed: 1000,
         expandedScrollOffThreshold: 200,
-        hideScrollbar: true
+        hideScrollbar: true,
+        bootstrapModalCompatibility: true
     };
 
 })(jQuery);

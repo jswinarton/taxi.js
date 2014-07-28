@@ -5,6 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Test</title>
         <meta name="description" content="">
+        <link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" charset="utf-8">
         <style type="text/css">
             ::-webkit-scrollbar {
                 display: none;
@@ -179,9 +180,37 @@
             <section style="background:#7f58a5"></section>
             <section style="background:#ef565c"></section>
             <section style="background:#4eb9e5"></section>
-            <section style="background:#ffdb62"></section>
+            <section style="background:#ffdb62">
+                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+                  Launch demo modal
+                </button>
+            </section>
+
         </div>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+        <!-- Button trigger modal -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+              </div>
+              <div class="modal-body">
+                ...
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="../src/taxi-movement.js"></script>
         <script src="../src/taxi.js"></script>
 

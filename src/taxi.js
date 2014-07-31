@@ -361,7 +361,7 @@
     var ScrollLock = function(){
         this.isLocked = false;
         this.evtString = 'mousewheel.scrolllock DOMMouseScroll.scrolllock \
-            MozMousePixelScroll.scrolllock touchstart.scrolllock \
+            MozMousePixelScroll.scrolllock \
             touchmove.scrolllock'; // keydown.scrolllock';
         this.lockHandler = function(e) {
             var keycodes = [33, 32, 34, 37, 38, 39, 40, 65, 68, 83, 87];
